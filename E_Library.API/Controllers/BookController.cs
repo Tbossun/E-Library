@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
-using E_Library.Core.Repositories.IRepositories;
+using E_Library.Core.Services.Implementations;
+using E_Library.Core.Services.Interfaces;
 using E_Library.Data.DTOS.Request;
+using E_Library.Data.DTOS.Response;
 using E_Library.Data.Models;
-using Microsoft.AspNetCore.Http;
+using E_Library.Data.Repositories.IRepositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace E_Library.API.Controllers
@@ -11,48 +13,55 @@ namespace E_Library.API.Controllers
     [ApiController]
     public class BookController : ControllerBase
     {
-       private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
+        private readonly IBookService _bookService;
 
-        public BookController(IUnitOfWork unitOfWork, IMapper mapper)
+        public BookController(IBookService bookService)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
+            _bookService = bookService;
         }
 
-        // GET: api/books
         [HttpGet]
-        public async Task<ActionResult> GetBooks(int pageNumber = 1, int pageSize = 10)
+        public async Task<ActionResult<ResponseDto<IEnumerable<BookDto>>>> GetBooksAsync(int pageNumber, int pageSize)
         {
-            var totalBooks = await _unitOfWork.BookRepo.CountAsync();
-            var books = await _unitOfWork.BookRepo.GetPageAsync(pageNumber, pageSize);
-
-            return Ok(new { TotalCount = totalBooks, Books = books });
+            var response = await _bookService.GetBooksAsync(pageNumber, pageSize);
+            return StatusCode(response.StatusCode, response);
         }
 
-        // GET: api/books/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult> GetBook(string id)
+        public async Task<ActionResult<ResponseDto<BookDto>>> GetBookAsync(string id)
         {
-            var book =  _unitOfWork.BookRepo.Get(i => i.Id == id);
-
-            if (book == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(book);
+            var response = await _bookService.GetBookAsync(id);
+            return StatusCode(response.StatusCode, response);
         }
 
-        // POST: api/books
         [HttpPost]
-        public async Task<ActionResult> CreateBook(AddBookDto book)
+        public async Task<ActionResult<ResponseDto<BookDto>>> CreateBookAsync([FromBody] AddBookDto bookDto)
         {
-            var newbook = _mapper.Map<Book>(book);
-             _unitOfWork.BookRepo.Add(newbook);
-             _unitOfWork.Save();
+            var response = await _bookService.CreateBookAsync(bookDto);
+            return StatusCode(response.StatusCode, response);
+        }
 
-            return CreatedAtAction(nameof(GetBook), new { id = book.Title }, book);
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ResponseDto<BookDto>>> UpdateBookAsync(string id, [FromBody] UpdateBookDto bookDto)
+        {
+            var response = await _bookService.UpdateBookAsync(id, bookDto);
+            return StatusCode(response.StatusCode, response);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<ResponseDto<bool>>> DeleteBookAsync(string id)
+        {
+            var response = await _bookService.DeleteBookAsync(id);
+            return StatusCode(response.StatusCode, response);
+        }
+
+        [HttpGet("search")]
+        public async Task<ActionResult<ResponseDto<IEnumerable<BookDto>>>> SearchBooksAsync(
+            string isbn, string? categoryId, string? subcategoryId, string? publisherId,
+            string searchTerm, int pageNumber, int pageSize)
+        {
+            var response = await _bookService.SearchBooksAsync(isbn, categoryId, subcategoryId, publisherId, searchTerm, pageNumber, pageSize);
+            return StatusCode(response.StatusCode, response);
         }
     }
 }

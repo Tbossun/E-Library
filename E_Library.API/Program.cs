@@ -1,9 +1,11 @@
-using E_Library.Core.Repositories.IRepositories;
-using E_Library.Core.Repositories;
 using E_Library.Data.Context;
 using E_Library.Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using E_Library.Data.Repositories;
+using E_Library.Data.Repositories.IRepositories;
+using E_Library.Core.Services.Interfaces;
+using E_Library.Core.Services.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +21,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 
 //Register unitOfWork
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IBookService, BookServices>();
 
 //Register Automapper service
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

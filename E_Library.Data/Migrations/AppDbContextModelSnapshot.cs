@@ -200,14 +200,14 @@ namespace E_Library.Data.Migrations
                         {
                             Id = "user1Id",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "daff7b1b-03de-49d9-a485-42226fff83b3",
+                            ConcurrencyStamp = "0492ac4f-d66c-4adb-98aa-b76e94f69190",
                             EmailConfirmed = false,
                             FirstName = "John",
                             ImageURL = "https://example.com/user1.jpg",
                             LastName = "Doe",
                             LockoutEnabled = false,
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "11f6ffd7-4e74-4e64-bac3-7d522fd7438e",
+                            SecurityStamp = "2c1d9865-9c04-492b-9c7a-69b89cd671f7",
                             TwoFactorEnabled = false,
                             UserName = "User1"
                         },
@@ -215,14 +215,14 @@ namespace E_Library.Data.Migrations
                         {
                             Id = "user2Id",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2294107a-e409-4157-afb2-5e0b2da9a6be",
+                            ConcurrencyStamp = "2599c5e3-58d7-4c76-ae3f-44a9f52886f4",
                             EmailConfirmed = false,
                             FirstName = "Jane",
                             ImageURL = "https://example.com/user2.jpg",
                             LastName = "Smith",
                             LockoutEnabled = false,
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "7503400d-c8f1-4d16-bcf8-bf66e1c141d3",
+                            SecurityStamp = "6b4d2f76-8a7c-454e-bbbf-3c345860ed3f",
                             TwoFactorEnabled = false,
                             UserName = "User2"
                         });

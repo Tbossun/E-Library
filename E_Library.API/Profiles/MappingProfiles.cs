@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using E_Library.Core.Services.Implementations;
 using E_Library.Data.DTOS.Request;
+using E_Library.Data.DTOS.Response;
 using E_Library.Data.Models;
 
 namespace E_Library.API.Profiles
@@ -10,6 +12,8 @@ namespace E_Library.API.Profiles
         {
             //CreateMap<ApplicationUser, SignUpDto>().ReverseMap();
             CreateMap<Book, AddBookDto>().ReverseMap();
+            CreateMap<Book, BookDto>().ReverseMap();
+            CreateMap<Book, UpdateBookDto>().ReverseMap();
         }
     }
 }

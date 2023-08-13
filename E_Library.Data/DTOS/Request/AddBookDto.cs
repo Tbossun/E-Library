@@ -1,4 +1,5 @@
 ﻿using E_Library.Data.Enums;
+using E_Library.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,5 +22,6 @@ namespace E_Library.Data.DTOS.Request
         public BookLanguage Language { get; set; }
         public BookFormat Format { get; set; }
         public BookAvailability Availability { get; set; }
+       // public ICollection<Author> Authors { get; set; }
     }
 }

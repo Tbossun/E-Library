@@ -41,6 +41,11 @@ namespace E_Library.Data.Context
                 .HasMany(subcategory => subcategory.Books)
                 .WithMany(book => book.Subcategories);
 
+            // Configure many-to-many relationship between Author and Book
+            modelBuilder.Entity<Book>()
+                .HasMany(book => book.Authors)
+                .WithMany(Author => Author.BooksBy);
+
             // Configure one-to-many relationship between Book and Publisher
             modelBuilder.Entity<Book>()
                 .HasOne(book => book.Publisher)
