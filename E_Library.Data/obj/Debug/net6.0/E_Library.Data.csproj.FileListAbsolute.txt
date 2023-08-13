@@ -1,0 +1,12 @@
+C:\Users\alabi\Desktop\OnBoard\E-Library\E_Library.API\E_Library.Data\bin\Debug\net6.0\E_Library.Data.deps.json
+C:\Users\alabi\Desktop\OnBoard\E-Library\E_Library.API\E_Library.Data\bin\Debug\net6.0\E_Library.Data.dll
+C:\Users\alabi\Desktop\OnBoard\E-Library\E_Library.API\E_Library.Data\bin\Debug\net6.0\E_Library.Data.pdb
+C:\Users\alabi\Desktop\OnBoard\E-Library\E_Library.API\E_Library.Data\obj\Debug\net6.0\E_Library.Data.csproj.AssemblyReference.cache
+C:\Users\alabi\Desktop\OnBoard\E-Library\E_Library.API\E_Library.Data\obj\Debug\net6.0\E_Library.Data.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\alabi\Desktop\OnBoard\E-Library\E_Library.API\E_Library.Data\obj\Debug\net6.0\E_Library.Data.AssemblyInfoInputs.cache
+C:\Users\alabi\Desktop\OnBoard\E-Library\E_Library.API\E_Library.Data\obj\Debug\net6.0\E_Library.Data.AssemblyInfo.cs
+C:\Users\alabi\Desktop\OnBoard\E-Library\E_Library.API\E_Library.Data\obj\Debug\net6.0\E_Library.Data.csproj.CoreCompileInputs.cache
+C:\Users\alabi\Desktop\OnBoard\E-Library\E_Library.API\E_Library.Data\obj\Debug\net6.0\E_Library.Data.dll
+C:\Users\alabi\Desktop\OnBoard\E-Library\E_Library.API\E_Library.Data\obj\Debug\net6.0\refint\E_Library.Data.dll
+C:\Users\alabi\Desktop\OnBoard\E-Library\E_Library.API\E_Library.Data\obj\Debug\net6.0\E_Library.Data.pdb
+C:\Users\alabi\Desktop\OnBoard\E-Library\E_Library.API\E_Library.Data\obj\Debug\net6.0\ref\E_Library.Data.dll
