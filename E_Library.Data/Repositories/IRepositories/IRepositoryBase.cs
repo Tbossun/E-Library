@@ -9,7 +9,7 @@ namespace E_Library.Data.Repositories.IRepositories
         void Add(T entity);
         void Remove(T entity);
         void RemoveRange(IEnumerable<T> entities);
-        Task<IEnumerable<T>> SearchAsync(Expression<Func<T, bool>> predicate);
+        Task<IEnumerable<T>> SearchAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includeProperties);
         Task<IEnumerable<T>> GetPageAsync(int pageNumber, int pageSize);
         Task<int> CountAsync();
 

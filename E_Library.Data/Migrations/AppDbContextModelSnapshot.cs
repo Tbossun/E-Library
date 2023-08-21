@@ -200,14 +200,14 @@ namespace E_Library.Data.Migrations
                         {
                             Id = "user1Id",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "0492ac4f-d66c-4adb-98aa-b76e94f69190",
+                            ConcurrencyStamp = "38d1f5b8-1317-486e-a042-d7e621f396bf",
                             EmailConfirmed = false,
                             FirstName = "John",
                             ImageURL = "https://example.com/user1.jpg",
                             LastName = "Doe",
                             LockoutEnabled = false,
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "2c1d9865-9c04-492b-9c7a-69b89cd671f7",
+                            SecurityStamp = "a3f23af7-c4e9-4f03-a139-43c36fa78499",
                             TwoFactorEnabled = false,
                             UserName = "User1"
                         },
@@ -215,14 +215,14 @@ namespace E_Library.Data.Migrations
                         {
                             Id = "user2Id",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2599c5e3-58d7-4c76-ae3f-44a9f52886f4",
+                            ConcurrencyStamp = "f16d0aa5-4afe-40cc-92f8-9198d491d0d7",
                             EmailConfirmed = false,
                             FirstName = "Jane",
                             ImageURL = "https://example.com/user2.jpg",
                             LastName = "Smith",
                             LockoutEnabled = false,
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "6b4d2f76-8a7c-454e-bbbf-3c345860ed3f",
+                            SecurityStamp = "e14d844a-3803-4023-96e9-a167840d1d60",
                             TwoFactorEnabled = false,
                             UserName = "User2"
                         });
@@ -308,7 +308,7 @@ namespace E_Library.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateOnly>("YearPublished")
+                    b.Property<DateTime>("YearPublished")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -336,7 +336,7 @@ namespace E_Library.Data.Migrations
                             Language = 0,
                             PublisherId = "1",
                             Title = "Book 1",
-                            YearPublished = new DateOnly(2022, 1, 1)
+                            YearPublished = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
@@ -351,7 +351,7 @@ namespace E_Library.Data.Migrations
                             Language = 1,
                             PublisherId = "2",
                             Title = "Book 2",
-                            YearPublished = new DateOnly(2023, 1, 1)
+                            YearPublished = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
 

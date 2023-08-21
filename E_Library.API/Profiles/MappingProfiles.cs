@@ -12,8 +12,11 @@ namespace E_Library.API.Profiles
         {
             //CreateMap<ApplicationUser, SignUpDto>().ReverseMap();
             CreateMap<Book, AddBookDto>().ReverseMap();
-            CreateMap<Book, BookDto>().ReverseMap();
             CreateMap<Book, UpdateBookDto>().ReverseMap();
+            CreateMap<Category, CreateCategory>().ReverseMap();
+            CreateMap<Category, categoryDto>().ReverseMap();
+            CreateMap<Category, GetCategory>().ReverseMap();
+            CreateMap<Book, BookDto>().ReverseMap();               
         }
     }
 }

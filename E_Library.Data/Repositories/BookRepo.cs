@@ -25,5 +25,20 @@ namespace E_Library.Data.Repositories
             _DbContext.Entry(book).State = EntityState.Modified;
             _DbContext.SaveChanges();
         }
+
+        public IEnumerable<Book> GetBooksByCategory(string id)
+        {
+            return _DbContext.Set<Book>()
+                .Where(book => book.CategoryId == id)
+                    .ToList();
+        }
+
+        /*public IEnumerable<Category> GetSubcategoryByCategory(Category category)
+        {
+            return _DbContext.Set<Category>()
+                .Where(u => u.Subcategories)
+                .ToList();
+        }*/
+
     }
 }

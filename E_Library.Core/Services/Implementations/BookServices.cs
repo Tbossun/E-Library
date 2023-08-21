@@ -19,11 +19,13 @@ namespace E_Library.Core.Services.Implementations
 
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IDocumentUploadService _uploadService;
 
-        public BookServices(IUnitOfWork unitOfWork, IMapper mapper)
+        public BookServices(IUnitOfWork unitOfWork, IMapper mapper, IDocumentUploadService uploadService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _uploadService = uploadService;
         }
 
         public async Task<ResponseDto<IEnumerable<BookDto>>> GetBooksAsync(int? pageNumber, int? pageSize)
@@ -112,6 +114,8 @@ namespace E_Library.Core.Services.Implementations
             }
         }
 
+
+
         public async Task<ResponseDto<BookDto>> GetBookAsync(string id)
         {
             try
@@ -155,20 +159,30 @@ namespace E_Library.Core.Services.Implementations
 
 
 
-        public async Task<ResponseDto<IEnumerable<BookDto>>> SearchBooksAsync(
-    string isbn, string? categoryId, string? subcategoryId, string? publisherId,
-    string searchTerm, int pageNumber, int pageSize)
+        public async Task<ResponseDto<IEnumerable<BookDto>>> SearchBooksAsync(string searchTerm, int pageNumber, int pageSize)
         {
             try
             {
                 Expression<Func<Book, bool>> filter = b =>
-                    (string.IsNullOrEmpty(isbn) || b.ISBN.Contains(isbn)) &&
-                    (string.IsNullOrEmpty(categoryId) || b.CategoryId == categoryId) &&
-                    (string.IsNullOrEmpty(publisherId) || b.PublisherId == publisherId) &&
-                    (string.IsNullOrEmpty(searchTerm) || b.Title.Contains(searchTerm));
+                    b.ISBN.Contains(searchTerm) ||
+                    b.Title.Contains(searchTerm) ||
+                    b.Authors.Any(a => a.AuthorName.Contains(searchTerm)) || // Check any author's name
+                    b.Category.CategoryName.Contains(searchTerm);
 
-                var books = await _unitOfWork.BookRepo.SearchAsync(filter);
+                var includeProperties = new Expression<Func<Book, object>>[]
+                {
+            b => b.Authors,
+            b => b.Category
+                };
+
+                var books = await _unitOfWork.BookRepo.SearchAsync(filter, includeProperties);
                 var booksDto = _mapper.Map<IEnumerable<Book>, IEnumerable<BookDto>>(books);
+
+                // Apply paging if needed
+                if (pageNumber > 0 && pageSize > 0)
+                {
+                    booksDto = booksDto.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+                }
 
                 var response = new ResponseDto<IEnumerable<BookDto>>
                 {
@@ -193,56 +207,77 @@ namespace E_Library.Core.Services.Implementations
         }
 
 
-        public async Task<ResponseDto<BookDto>> UpdateBookAsync(string id, UpdateBookDto bookDto)
+
+       public async Task<ResponseDto<BookDto>> UpdateBookAsync(string id, UpdateBookDto bookDto)
+{
+    try
+    {
+        var existingBook =  _unitOfWork.BookRepo.Get(b => b.Id == id);
+        if (existingBook == null)
         {
-            try
+            var notFoundResponse = new ResponseDto<BookDto>
             {
-                var existingBook =  _unitOfWork.BookRepo.Get(b => b.Id == id);
-                if (existingBook == null)
-                {
-                    var notFoundResponse = new ResponseDto<BookDto>
-                    {
-                        StatusCode = (int)HttpStatusCode.NotFound,
-                        DisplayMessage = "Book not found.",
-                        Result = null
-                    };
+                StatusCode = (int)HttpStatusCode.NotFound,
+                DisplayMessage = "Book not found.",
+                Result = null
+            };
 
-                    return notFoundResponse;
-                }
-
-                _mapper.Map(bookDto, existingBook);
-                _unitOfWork.BookRepo.Update(existingBook);
-                _unitOfWork.Save();
-
-                var updatedBookDto = _mapper.Map<BookDto>(existingBook);
-
-                var response = new ResponseDto<BookDto>
-                {
-                    StatusCode = (int)HttpStatusCode.OK,
-                    DisplayMessage = "Book updated successfully.",
-                    Result = updatedBookDto
-                };
-
-                return response;
-            }
-            catch (Exception ex)
-            {
-                var response = new ResponseDto<BookDto>
-                {
-                    StatusCode = (int)HttpStatusCode.InternalServerError,
-                    DisplayMessage = $"An error occurred: {ex.Message}",
-                    Result = null
-                };
-
-                return response;
-            }
+            return notFoundResponse;
         }
+
+        string imageUrl = existingBook.ImageURL; // Preserve existing image URL
+
+        if (bookDto.File != null)
+        {
+            var bookImage = await _uploadService.UploadImageAsync(bookDto.File);
+            imageUrl = bookImage.Url.ToString();
+        }
+
+        _mapper.Map(bookDto, existingBook);
+        existingBook.ImageURL = imageUrl; // Update the image URL
+        _unitOfWork.BookRepo.Update(existingBook);
+        _unitOfWork.Save();
+
+        var updatedBookDto = _mapper.Map<BookDto>(existingBook);
+
+        var response = new ResponseDto<BookDto>
+        {
+            StatusCode = (int)HttpStatusCode.OK,
+            DisplayMessage = "Book updated successfully.",
+            Result = updatedBookDto
+        };
+
+        return response;
+    }
+    catch (Exception ex)
+    {
+        var response = new ResponseDto<BookDto>
+        {
+            StatusCode = (int)HttpStatusCode.InternalServerError,
+            DisplayMessage = $"An error occurred: {ex.Message}",
+            Result = null
+        };
+
+        return response;
+    }
+}
+
+
 
         public async Task<ResponseDto<BookDto>> CreateBookAsync(AddBookDto book)
         {
             try
             {
+                string imageUrl = string.Empty;
+
+                if (book.File != null)
+                {
+                    var bookImage = await _uploadService.UploadImageAsync(book.File);
+                    imageUrl = bookImage.Url.ToString();
+                }
+
                 var newBook = _mapper.Map<Book>(book);
+                newBook.ImageURL = imageUrl;
                 _unitOfWork.BookRepo.Add(newBook);
                 _unitOfWork.Save();
 
@@ -255,7 +290,7 @@ namespace E_Library.Core.Services.Implementations
                     Result = createdBookDto
                 };
 
-                return await Task.FromResult(response);
+                return response;
             }
             catch (Exception ex)
             {
@@ -266,10 +301,203 @@ namespace E_Library.Core.Services.Implementations
                     Result = null
                 };
 
+                return response;
+            }
+        }
+
+
+
+
+        public async Task<ResponseDto<IEnumerable<GetCategory>>> GetCategories()
+        {
+            try
+            {
+                var cat =  _unitOfWork.CategoryRepo.GetAll(); // Assuming you have an asynchronous GetAllAsync method
+                var categoriesDto = _mapper.Map<IEnumerable<Category>, IEnumerable<GetCategory>>(cat);
+
+                var response = new ResponseDto<IEnumerable<GetCategory>>
+                {
+                    StatusCode = (int)HttpStatusCode.OK,
+                    DisplayMessage = "Categories retrieved successfully.",
+                    Result = categoriesDto
+                };
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                var response = new ResponseDto<IEnumerable<GetCategory>>
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
+                    DisplayMessage = $"An error occurred: {ex.Message}",
+                    Result = null
+                };
+
+                return response;
+            }
+        }
+
+
+        public async Task<ResponseDto<GetCategory>> GetACategory(string id)
+        {
+            try
+            {
+                var Category = _unitOfWork.CategoryRepo.Get(b => b.Id == id);
+                if (Category == null)
+                {
+                    var notFoundResponse = new ResponseDto<GetCategory>
+                    {
+                        StatusCode = (int)HttpStatusCode.NotFound,
+                        DisplayMessage = "Category not found.",
+                        Result = null
+                    };
+
+                    return notFoundResponse;
+                }
+
+                var category = _mapper.Map<GetCategory>(Category);
+
+                var response = new ResponseDto<GetCategory>
+                {
+                    StatusCode = (int)HttpStatusCode.OK,
+                    DisplayMessage = "Category retrieved successfully.",
+                    Result = category
+                };
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                var response = new ResponseDto<GetCategory>
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
+                    DisplayMessage = $"An error occurred: {ex.Message}",
+                    Result = null
+                };
+
+                return response;
+            }
+        }
+
+
+        public async Task<ResponseDto<CreateCategory>> CreateACategory(CreateCategory category)
+        {
+            try
+            {
+                var newCategory = _mapper.Map<Category>(category);
+                _unitOfWork.CategoryRepo.Add(newCategory);
+                _unitOfWork.Save();
+
+                var createdBookDto = _mapper.Map<CreateCategory>(newCategory);
+
+                var response = new ResponseDto<CreateCategory>
+                {
+                    StatusCode = (int)HttpStatusCode.Created,
+                    DisplayMessage = "New Category created successfully.",
+                    Result = createdBookDto
+                };
+
+                return await Task.FromResult(response);
+            }
+            catch (Exception ex)
+            {
+                var response = new ResponseDto<CreateCategory>
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
+                    DisplayMessage = $"An error occurred: {ex.Message}",
+                    Result = null
+                };
+
                 return await Task.FromResult(response);
             }
         }
 
+        public Task<ResponseDto<CreateCategory>> UpdateCategory(string id, CreateCategory category)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<ResponseDto<bool>> DeleteCategory(string id)
+        {
+            try
+            {
+                var existingCategory = _unitOfWork.CategoryRepo.Get(b => b.Id == id);
+                if (existingCategory == null)
+                {
+                    var notFoundResponse = new ResponseDto<bool>
+                    {
+                        StatusCode = (int)HttpStatusCode.NotFound,
+                        DisplayMessage = "Category not found.",
+                        Result = false
+                    };
+
+                    return notFoundResponse;
+                }
+
+                _unitOfWork.CategoryRepo.Remove(existingCategory);
+                _unitOfWork.Save();
+
+                var response = new ResponseDto<bool>
+                {
+                    StatusCode = (int)HttpStatusCode.OK,
+                    DisplayMessage = "Category deleted successfully.",
+                    Result = true
+                };
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                var response = new ResponseDto<bool>
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
+                    DisplayMessage = $"An error occurred: {ex.Message}",
+                    Result = false
+                };
+
+                return response;
+            }
+        }
+
+        public Task<ResponseDto<IEnumerable<GetCategory>>> SearchCategory(string isbn, string? categoryId, string? subcategoryId, string? publisherId, string searchTerm, int pageNumber, int pageSize)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<ResponseDto<IEnumerable<BookDto>>> GetBooksByCategoryAsync(string categoryId, int? pageNumber, int? pageSize)
+        {
+            try
+            {
+                var books = _unitOfWork.BookRepo.GetBooksByCategory(categoryId);
+                var booksDto = _mapper.Map<IEnumerable<Book>, IEnumerable<BookDto>>(books);
+
+                // Apply paging if needed
+                if (pageNumber.HasValue && pageSize.HasValue)
+                {
+                    booksDto = booksDto.Skip((pageNumber.Value - 1) * pageSize.Value).Take(pageSize.Value);
+                }
+
+                var response = new ResponseDto<IEnumerable<BookDto>>
+                {
+                    StatusCode = (int)HttpStatusCode.OK,
+                    DisplayMessage = "Books retrieved successfully.",
+                    Result = booksDto
+                };
+
+                return await Task.FromResult(response); // Wrap the response in Task.FromResult
+            }
+            catch (Exception ex)
+            {
+                var response = new ResponseDto<IEnumerable<BookDto>>
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
+                    DisplayMessage = $"An error occurred: {ex.Message}",
+                    Result = null
+                };
+
+                return await Task.FromResult(response); // Wrap the response in Task.FromResult
+            }
+        }
 
     }
 }

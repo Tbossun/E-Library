@@ -17,7 +17,14 @@ namespace E_Library.Core.Services.Interfaces
         Task<ResponseDto<BookDto>> CreateBookAsync(AddBookDto book);
         Task<ResponseDto<BookDto>> UpdateBookAsync(string id, UpdateBookDto book);
         Task<ResponseDto<bool>> DeleteBookAsync(string id);
-        Task<ResponseDto<IEnumerable<BookDto>>> SearchBooksAsync(
+        Task<ResponseDto<IEnumerable<BookDto>>> SearchBooksAsync(string searchTerm, int pageNumber, int pageSize);
+        Task<ResponseDto<IEnumerable<GetCategory>>> GetCategories();
+        Task<ResponseDto<GetCategory>> GetACategory(string id);
+        Task<ResponseDto<CreateCategory>> CreateACategory(CreateCategory category);
+        Task<ResponseDto<CreateCategory>> UpdateCategory(string id, CreateCategory category);
+        Task<ResponseDto<bool>> DeleteCategory(string id);
+        Task<ResponseDto<IEnumerable<BookDto>>> GetBooksByCategoryAsync(string categoryId, int? pageNumber, int? pageSize);
+        Task<ResponseDto<IEnumerable<GetCategory>>> SearchCategory(
             string isbn, string? categoryId, string? subcategoryId,
             string? publisherId, string searchTerm, int pageNumber, int pageSize);
     }

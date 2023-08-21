@@ -15,7 +15,7 @@ namespace E_Library.Data.Models
 
         public string ISBN { get; set; }  
         public string ImageURL { get; set; } = string.Empty;
-        public DateOnly YearPublished { get; set; }
+        public DateTime YearPublished { get; set; }
         public string CategoryId { get; set; }
 
         public BookLanguage Language { get; set; }

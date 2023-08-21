@@ -111,8 +111,8 @@ namespace E_Library.Data.Context
             // Seed Books
             var books = new List<Book>
     {
-        new Book { Id = "1", Title = "Book 1", Description = "Description of Book 1", PublisherId = "1", ISBN = "123456789",CategoryId = "1", YearPublished = new DateOnly(2022, 1, 1), Availability = BookAvailability.Available, Format = BookFormat.Hardcover, Language = BookLanguage.English, ImageURL = "https://example.com/book1.jpg"},
-        new Book { Id = "2", Title = "Book 2", Description = "Description of Book 2", PublisherId = "2", ISBN = "987654321",CategoryId = "2", YearPublished = new DateOnly(2023, 1, 1), Availability = BookAvailability.Available, Format = BookFormat.Hardcover, Language = BookLanguage.French, ImageURL = "https://example.com/book2.jpg" },
+        new Book { Id = "1", Title = "Book 1", Description = "Description of Book 1", PublisherId = "1", ISBN = "123456789",CategoryId = "1", YearPublished = new DateTime(2022, 1, 1), Availability = BookAvailability.Available, Format = BookFormat.Hardcover, Language = BookLanguage.English, ImageURL = "https://example.com/book1.jpg"},
+        new Book { Id = "2", Title = "Book 2", Description = "Description of Book 2", PublisherId = "2", ISBN = "987654321",CategoryId = "2", YearPublished = new DateTime(2023, 1, 1), Availability = BookAvailability.Available, Format = BookFormat.Hardcover, Language = BookLanguage.French, ImageURL = "https://example.com/book2.jpg" },
         // Add more books...
     };
             modelBuilder.Entity<Book>().HasData(books);

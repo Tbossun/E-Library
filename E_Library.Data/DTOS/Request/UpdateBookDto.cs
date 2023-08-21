@@ -1,4 +1,5 @@
 ﻿using E_Library.Data.Enums;
+using Microsoft.AspNetCore.Http;
 
 namespace E_Library.Core.Services.Implementations
 {
@@ -9,7 +10,7 @@ namespace E_Library.Core.Services.Implementations
         public string PublisherId { get; set; }
 
         public string ISBN { get; set; }
-        public string ImageURL { get; set; }
+        public IFormFile File { get; set; } = null;
         public DateOnly YearPublished { get; set; }
         public string CategoryId { get; set; }
 

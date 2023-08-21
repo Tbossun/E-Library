@@ -10,5 +10,6 @@ namespace E_Library.Data.Repositories.IRepositories
     public interface IBookRepo : IRepositoryBase<Book>
     {
         void Update(Book book);
+        IEnumerable<Book> GetBooksByCategory(string id);
     }
 }

@@ -20,29 +20,29 @@ namespace E_Library.API.Controllers
             _bookService = bookService;
         }
 
-        [HttpGet]
+        [HttpGet("All-Books")]
         public async Task<ActionResult<ResponseDto<IEnumerable<BookDto>>>> GetBooksAsync(int pageNumber, int pageSize)
         {
             var response = await _bookService.GetBooksAsync(pageNumber, pageSize);
             return StatusCode(response.StatusCode, response);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("Book-By{id}")]
         public async Task<ActionResult<ResponseDto<BookDto>>> GetBookAsync(string id)
         {
             var response = await _bookService.GetBookAsync(id);
             return StatusCode(response.StatusCode, response);
         }
 
-        [HttpPost]
-        public async Task<ActionResult<ResponseDto<BookDto>>> CreateBookAsync([FromBody] AddBookDto bookDto)
+        [HttpPost("Add-A-Book")]
+        public async Task<ActionResult<ResponseDto<BookDto>>> CreateBookAsync([FromForm] AddBookDto bookDto)
         {
             var response = await _bookService.CreateBookAsync(bookDto);
             return StatusCode(response.StatusCode, response);
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult<ResponseDto<BookDto>>> UpdateBookAsync(string id, [FromBody] UpdateBookDto bookDto)
+        [HttpPut("Update-Book{id}")]
+        public async Task<ActionResult<ResponseDto<BookDto>>> UpdateBookAsync(string id, [FromForm] UpdateBookDto bookDto)
         {
             var response = await _bookService.UpdateBookAsync(id, bookDto);
             return StatusCode(response.StatusCode, response);
@@ -56,12 +56,40 @@ namespace E_Library.API.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<ActionResult<ResponseDto<IEnumerable<BookDto>>>> SearchBooksAsync(
-            string isbn, string? categoryId, string? subcategoryId, string? publisherId,
-            string searchTerm, int pageNumber, int pageSize)
+        public async Task<ActionResult<ResponseDto<IEnumerable<BookDto>>>> SearchBooksAsync(string searchTerm, int pageNumber, int pageSize)
         {
-            var response = await _bookService.SearchBooksAsync(isbn, categoryId, subcategoryId, publisherId, searchTerm, pageNumber, pageSize);
+            var response = await _bookService.SearchBooksAsync(searchTerm, pageNumber, pageSize);
+            return StatusCode(response.StatusCode, response);                                             
+        }
+
+
+        [HttpGet("All-Categories")]
+        public async Task<ActionResult<ResponseDto<IEnumerable<GetCategory>>>> GetCategories()
+        {
+            var response = await _bookService.GetCategories();
             return StatusCode(response.StatusCode, response);
         }
+
+        [HttpGet("Category{id}")]
+        public async Task<ActionResult<ResponseDto<GetCategory>>> GetACategory(string id)
+        {
+            var response = await _bookService.GetACategory(id);
+            return StatusCode(response.StatusCode, response);
+        }
+
+        [HttpPost("Category")]
+        public async Task<ActionResult<ResponseDto<GetCategory>>> CreateCategoryAsync([FromBody] CreateCategory category)
+        {
+            var response = await _bookService.CreateACategory(category);
+            return StatusCode(response.StatusCode, response);
+        }
+
+        [HttpGet("categories/{categoryId}")]
+        public async Task<IActionResult> GetBooksByCategory(string categoryId, int? pageNumber, int? pageSize)
+        {
+            var response = await _bookService.GetBooksByCategoryAsync(categoryId, pageNumber, pageSize);
+            return StatusCode(response.StatusCode, response);
+        }
+
     }
 }

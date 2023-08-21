@@ -74,10 +74,23 @@ namespace E_Library.Data.Repositories
             dbSet.RemoveRange(entities);
         }
 
-        public Task<IEnumerable<T>> SearchAsync(Expression<Func<T, bool>> predicate)
+        public async Task<IEnumerable<T>> SearchAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includeProperties)
         {
-            throw new NotImplementedException();
+            IQueryable<T> query = dbSet.AsQueryable();
+
+            if (includeProperties != null)
+            {
+                foreach (var includeExpression in includeProperties)
+                {
+                    query = query.Include(includeExpression);
+                }
+            }
+
+            query = query.Where(predicate);
+
+            return await query.ToListAsync();
         }
+
 
         public async Task<IEnumerable<T>> GetPageAsync(int pageNumber, int pageSize)
         {
